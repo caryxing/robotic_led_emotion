@@ -5,6 +5,8 @@
 import time
 import json
 from neopixel import *
+from threading import Thread
+import threading
 
 # LED strip configuration:
 LED_COUNT   = 12      # Number of LED pixels.
@@ -20,8 +22,10 @@ class RobotEmot():
     def __init__(self):
         self.emotFileList = []
         self.emotBank = {}
+        self.ledThread = None
         self.loadEmotList()
         self.loadEmotBank()
+        self.ledThreadStop = threading.Event()
         self.strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
         self.strip.begin()
                                         
@@ -47,25 +51,37 @@ class RobotEmot():
 
     def ledBlue(self, leds):
         for led in leds:
-            self.strip.setPixelColor(led, Color(0, 0, 127))
+            self.strip.setPixelColor(led-1, Color(0, 0, 127))
 
     def ledRed(self, leds):
         for led in leds:
-            self.strip.setPixelColor(led, Color(0, 127, 0))
+            self.strip.setPixelColor(led-1, Color(0, 127, 0))
 
     def ledGreen(self, leds):
         for led in leds:
-            self.strip.setPixelColor(led, Color(127, 0, 0))
+            self.strip.setPixelColor(led-1, Color(127, 0, 0))
 
     def ledYellow(self, leds):
         for led in leds:
-            self.strip.setPixelColor(led, Color(127, 127, 0))
+            self.strip.setPixelColor(led-1, Color(127, 127, 0))
 
     def ledWhite(self, leds):
         for led in leds:
-            self.strip.setPixelColor(led, Color(127, 127, 127))
+            self.strip.setPixelColor(led-1, Color(127, 127, 127))
 
-    def setEmotion(self, emotionCat, degree):
+    def setEmotion(self, emotionCat, degree, block=False):
+        if not block:
+            if self.ledThread:
+                self.ledThreadStop.set()
+                self.ledThread.join()
+                
+            self.ledThreadStop.clear()
+            self.ledThread = Thread(target=self.setEmotion_in, args=(emotionCat, degree, self.ledThreadStop))
+            self.ledThread.start()
+        else:
+            self.setEmotion_in(emotionCat, degree)    
+        
+    def setEmotion_in(self, emotionCat, degree, stop=None):
         emotionName = emotionCat + '-' + str(degree)
         emotion = self.emotBank.get(emotionName, None)
         if not emotion:
@@ -75,6 +91,8 @@ class RobotEmot():
         scenes = emotion["scene"]
         for i in xrange(repeat):
             for scene in scenes:
+                if stop and stop.is_set():
+                    return
                 self.offAll()
                 self.ledBlue(scene.get("blue", []))
                 self.ledRed(scene.get("red", []))
