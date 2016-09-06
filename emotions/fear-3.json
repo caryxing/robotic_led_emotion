@@ -1,0 +1,17 @@
+{
+	"name": "fear-3",
+	"desc": "This is the most fearful emotion",
+	"repeat": 10,
+	"scene": [
+		{
+			"last": 100,
+			"red": [1,3,5,7,9,11],
+			"blue": [2,4,6,8,10,12]
+		},
+		{
+			"last": 100,
+			"blue": [1,3,5,7,9,11],
+			"red": [2,4,6,8,10,12]
+		}
+	]
+}

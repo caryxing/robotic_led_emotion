@@ -1,0 +1,17 @@
+{
+	"name": "happy-3",
+	"desc": "This is the happiest emotion",
+	"repeat": 10,
+	"scene": [
+		{
+			"last": 100,
+			"yellow": [1,3,5,7,9,11],
+			"white": [2,4,6,8,10,12]
+		},
+		{
+			"last": 100,
+			"white": [1,3,5,7,9,11],
+			"yellow": [2,4,6,8,10,12]
+		}
+	]
+}
