@@ -80,10 +80,6 @@ class RobotEmot():
                 self.ledRed(scene.get("red", []))
                 self.ledGreen(scene.get("green", []))
                 self.ledYellow(scene.get("yellow", []))
+                self.ledWhite(scene.get("white", []))
                 time.sleep(scene["last"]/float(1000))
                 self.strip.show()
-                
-if __name__ == "__main__":
-    a = RobotEmot()
-    a.setEmotion("happy", 1)
-    #a.setEmotion("happy", 2)
